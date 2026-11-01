@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quem cometeu o crime? – Caso 001</title>
+<link href="https://fonts.googleapis.com/css2?family=Poiret+One&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--noite:#101a18;--parede:#182925;--latao:#c9a85c;--vinho:#7a2331;--papel:#e6d9b8;--tinta:#2b1e12;--texto:#ece3cc;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:radial-gradient(ellipse at top,#1d3530,var(--noite) 70%);color:var(--texto);font:500 19px/1.55 "Cormorant Garamond",Georgia,serif;min-height:100vh}
+main{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+.moldura{border:1px solid var(--latao);outline:1px solid var(--latao);outline-offset:6px;padding:22px 18px;background:rgba(10,18,16,.55)}
+h1,h2,h3{font-family:"Poiret One","Cormorant Garamond",serif;font-weight:400;margin:0;color:var(--latao)}
+h1{font-size:clamp(34px,7vw,64px);text-align:center;line-height:1.05}
+.sub{text-align:center;font-style:italic;margin:6px 0 0}
+.deco{display:block;margin:14px auto;width:min(320px,80%);height:16px}
+h2{font-size:30px;margin-bottom:6px}
+section{margin-top:28px}
+.cena-img{background:#0b1311;border:1px solid var(--latao)}
+.cena-img svg{display:block;width:100%;height:auto}
+.room{cursor:pointer}
+.room rect{fill:#f2c96b;opacity:.85;transition:opacity .2s}
+.room:hover rect,.room:focus rect{opacity:1;stroke:#fff3c4;stroke-width:2}
+.room:focus{outline:none}
+.room text{fill:var(--latao);font:italic 15px "Cormorant Garamond",serif;text-anchor:middle}
+.dica{font-style:italic;text-align:center;margin:8px 0 0;opacity:.85}
+#cena{display:grid;grid-template-columns:170px 1fr;gap:20px;align-items:start;margin-top:18px;padding:18px;background:var(--parede);border-left:4px solid var(--vinho)}
+#cena p{margin:.4em 0}
+.fig svg{width:100%;height:auto;display:block}
+.ret{filter:sepia(.55) contrast(.95)}
+.fig.pessoa{border-radius:50%/46%;overflow:hidden;border:3px double var(--latao);background:#d8c9a3}
+.fig.objeto{background:#14211e;border:1px solid var(--latao);padding:6px}
+.aviso{font-style:italic;color:var(--latao)}
+.suspeitos{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:12px}
+.sus{background:none;border:1px solid var(--latao);color:inherit;font:inherit;padding:10px 8px 12px;cursor:pointer;text-align:center;transition:background .2s}
+.sus:hover,.sus:focus-visible{background:rgba(201,168,92,.14);outline:2px solid var(--latao);outline-offset:2px}
+.sus .moldura-ret{border-radius:50%/46%;overflow:hidden;border:3px double var(--latao);background:#d8c9a3;margin:0 auto 8px;width:78%}
+.sus svg{display:block;width:100%;height:auto}
+.sus b{display:block;font-family:"Poiret One",serif;font-size:24px;color:var(--latao);font-weight:400}
+.sus.feito{opacity:.6}
+.quadro{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px;padding:18px;background:#2a1b13;border:6px solid #4a3322}
+.bilhete{background:var(--papel);color:var(--tinta);padding:14px 12px;min-height:130px;transform:rotate(-1.2deg);box-shadow:0 3px 6px rgba(0,0,0,.5);position:relative}
+.bilhete:nth-child(2){transform:rotate(1.3deg)}
+.bilhete::before{content:"";position:absolute;top:-7px;left:50%;width:14px;height:14px;border-radius:50%;background:var(--vinho);box-shadow:inset -2px -2px 0 rgba(0,0,0,.35)}
+.bilhete h3{color:var(--vinho);font-size:21px;margin-bottom:4px}
+.bilhete p{margin:0;font-size:17px;line-height:1.35}
+.bilhete.vazio{background:transparent;border:2px dashed #6b523a;box-shadow:none;color:#a58c6c;font-style:italic;display:grid;place-items:center;text-align:center}
+.bilhete.vazio::before{display:none}
+.acoes{text-align:center;margin-top:30px}
+button.acusar,dialog button.op{font:700 22px "Cormorant Garamond",serif;background:var(--vinho);color:#f6ecd3;border:2px solid var(--latao);padding:10px 30px;cursor:pointer}
+button.acusar:hover,button.acusar:focus-visible,dialog button.op:hover,dialog button.op:focus-visible{background:#9a2c3e;outline:2px solid #fff3c4;outline-offset:2px}
+dialog{background:var(--papel);color:var(--tinta);border:3px double var(--vinho);max-width:520px;width:calc(100% - 32px);padding:24px;font:500 19px/1.5 "Cormorant Garamond",serif}
+dialog::backdrop{background:rgba(0,0,0,.75)}
+dialog h2{color:var(--vinho)}
+dialog .lista{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+dialog button.op{font-size:20px;padding:8px}
+dialog .cancelar{background:none;border:0;color:var(--tinta);text-decoration:underline;font:inherit;cursor:pointer}
+@media(max-width:700px){#cena{grid-template-columns:1fr}.fig{max-width:170px}.suspeitos{grid-template-columns:repeat(2,1fr)}.quadro{grid-template-columns:1fr}.room text{font-size:19px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<div class="moldura">
+<h1>Quem cometeu o crime?</h1>
+<p class="sub">Caso 001 – O mistério da Mansão Carvalho</p>
+<svg class="deco" viewBox="0 0 320 16" aria-hidden="true"><path d="M0 8H140M180 8H320" stroke="#c9a85c"/><path d="M160 1l8 7-8 7-8-7z" fill="#c9a85c"/></svg>
+
+<div class="cena-img" id="mansao"></div>
+<p class="dica">Toque numa janela iluminada para investigar um cômodo.</p>
+
+<div id="cena" aria-live="polite"></div>
+
+<section>
+<h2>Suspeitos</h2>
+<div class="suspeitos" id="suspeitos"></div>
+</section>
+
+<section>
+<h2>Quadro de pistas</h2>
+<div class="quadro" id="quadro"></div>
+</section>
+
+<div class="acoes"><button class="acusar" id="btnAcusar">Fazer acusação</button></div>
+</div>
+</main>
+
+<dialog id="dlg"></dialog>
+
+<script>
+const $=s=>document.querySelector(s);
+let fim=false;
+const achou={}, inter={};
+
+/* ---------- Ilustrações ---------- */
+function mansao(){
+  let j='';
+  for(let x of [110,150,200,505,550,590]) for(let y of [165,205]) j+=`<rect x="${x}" y="${y}" width="22" height="30" fill="#2c4a43"/>`;
+  for(let x of [275,300,430]) for(let y of [135,185,215]) if(!(x==300&&y==135)) j+=`<rect x="${x}" y="${y}" width="20" height="${y==215?35:30}" fill="#2c4a43"/>`;
+  return `<svg viewBox="0 0 720 320" role="img" aria-label="Fachada da Mansão Carvalho à noite">
+<defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#08100e"/><stop offset="1" stop-color="#27453e"/></linearGradient></defs>
+<rect width="720" height="320" fill="url(#c)"/>
+<circle cx="640" cy="52" r="26" fill="#e9dcae"/><circle cx="650" cy="46" r="24" fill="#10201c" opacity=".25"/>
+<g fill="#e9dcae"><circle cx="60" cy="40" r="1.5"/><circle cx="200" cy="30" r="1.5"/><circle cx="330" cy="50" r="1.5"/><circle cx="470" cy="25" r="1.5"/><circle cx="540" cy="60" r="1.5"/><circle cx="120" cy="80" r="1.5"/></g>
+<g fill="#0b1513"><ellipse cx="40" cy="260" rx="60" ry="55"/><ellipse cx="690" cy="262" rx="62" ry="55"/>
+<rect x="90" y="160" width="170" height="110"/><rect x="250" y="115" width="220" height="155"/><rect x="460" y="160" width="170" height="110"/>
+<polygon points="250,115 360,62 470,115"/><polygon points="90,160 175,120 260,160"/><polygon points="460,160 545,120 630,160"/>
+<rect x="410" y="70" width="18" height="40"/><rect x="226" y="262" width="270" height="14"/></g>
+<path d="M0 275H720V320H0z" fill="#0a1210"/>
+<path d="M335 270V225a25 25 0 0150 0v45z" fill="#3a1f17" stroke="#c9a85c"/>
+<g>${j}</g>
+<g class="room" tabindex="0" role="button" aria-label="Investigar o escritório de Arthur" data-r="doc"><rect x="322" y="132" width="76" height="48"/><path d="M360 132v48M322 156h76" stroke="#3a2a14" stroke-width="3"/><text x="360" y="104">Escritório</text></g>
+<g class="room" tabindex="0" role="button" aria-label="Investigar a biblioteca" data-r="liv"><rect x="120" y="182" width="100" height="50"/><path d="M170 182v50M120 207h100" stroke="#3a2a14" stroke-width="3"/><text x="170" y="150">Biblioteca</text></g>
+<g class="room" tabindex="0" role="button" aria-label="Investigar a cozinha" data-r="copo"><rect x="500" y="182" width="100" height="50"/><path d="M550 182v50M500 207h100" stroke="#3a2a14" stroke-width="3"/><text x="550" y="150">Cozinha</text></g>
+</svg>`;
+}
+const P='<path d="M43 12 Q60 20 77 12" fill="none"/>';
+function rosto(c,hair,extra,boca){
+  return `<svg class="ret" viewBox="0 0 120 150"><rect width="120" height="150" fill="#cdbb90"/>
+<path d="M8 150Q14 108 60 104Q106 108 112 150z" fill="${c.roupa}"/>${extra[0]||''}
+<rect x="52" y="86" width="16" height="22" fill="${c.pele}"/><ellipse cx="60" cy="62" rx="26" ry="32" fill="${c.pele}"/>${hair}
+<circle cx="50" cy="62" r="2.5" fill="#222"/><circle cx="70" cy="62" r="2.5" fill="#222"/>
+<path d="M44 55Q50 52 56 55M64 55Q70 52 76 55" stroke="#3a2a1c" fill="none" stroke-width="2"/><path d="M60 64v10" stroke="#00000030" stroke-width="2"/>
+${boca}${extra[1]||''}</svg>`;
+}
+const boca='<path d="M52 82Q60 87 68 82" stroke="#6a3b2a" fill="none" stroke-width="2"/>';
+const SUS=[
+ {nome:'Helena',papel:'Governanta',
+  svg:rosto({pele:'#e3c3a0',roupa:'#2d2d33'},'<path d="M33 62Q30 28 60 28Q90 28 87 62Q80 42 60 42Q40 42 33 62z" fill="#8c8c8c"/><circle cx="60" cy="22" r="11" fill="#8c8c8c"/>',['<path d="M44 106L60 128L76 106z" fill="#f1ead8"/>',''],boca),
+  fala:['“Eu estava preparando o jantar naquela noite. Por volta das 22h30, ouvi um barulho vindo do escritório de Arthur. Não fui verificar porque estava ocupada na cozinha.”','“Arthur parecia preocupado nos últimos dias, mas nunca me contou o motivo.”']},
+ {nome:'Ricardo',papel:'Irmão de Arthur',
+  svg:rosto({pele:'#deb893',roupa:'#3b3b44'},'<path d="M33 58Q32 28 60 28Q88 28 87 58Q78 42 60 42Q42 42 33 58z" fill="#2b2118"/>',['<path d="M46 104L60 150L74 104z" fill="#efe6cf"/>','<path d="M46 76Q60 68 74 76Q60 82 46 76z" fill="#2b2118"/><path d="M50 108L60 113L50 118zM70 108L60 113L70 118z" fill="#5a1620"/>'],''),
+  fala:['“Eu estava na biblioteca lendo um livro. Não tinha motivo para entrar no escritório naquela noite.”','“É verdade que Arthur e eu discutimos por causa de dinheiro, mas isso é um assunto de família.”','“Eu jamais faria algo contra meu próprio irmão.”']},
+ {nome:'Beatriz',papel:'Sobrinha de Arthur',
+  svg:rosto({pele:'#efcfb0',roupa:'#5b2b46'},'<path d="M30 84Q24 24 60 24Q96 24 90 84L80 84Q84 46 60 44Q36 46 40 84z" fill="#4e2716"/>',['','<g fill="#f3efe4"><circle cx="46" cy="106" r="3"/><circle cx="53" cy="110" r="3"/><circle cx="60" cy="112" r="3"/><circle cx="67" cy="110" r="3"/><circle cx="74" cy="106" r="3"/></g>'],'<path d="M52 82Q60 86 68 82" stroke="#a03a4a" fill="none" stroke-width="3"/>'),
+  fala:['“Eu estava no jardim quando tudo aconteceu. Precisava de um pouco de ar.”','“Meu tio estava estranho naquela noite e parecia desconfiar de alguém.”','“Não sei quem poderia querer machucá-lo.”']},
+ {nome:'Daniel',papel:'Mordomo',
+  svg:rosto({pele:'#e0bd9a',roupa:'#16161a'},'<path d="M34 66Q31 48 40 44L41 62zM86 66Q89 48 80 44L79 62z" fill="#b9b9b9"/>',['<path d="M46 104L60 150L74 104z" fill="#f4f0e4"/>','<path d="M50 108L60 113L50 119zM70 108L60 113L70 119z" fill="#111"/>'],boca),
+  fala:['“Eu estava organizando o salão para o encerramento da festa.”','“Passei pelo corredor do escritório por volta das 22h45, mas a porta estava fechada. Não vi ninguém entrando ou saindo.”']}
+];
+const ART={
+ doc:`<svg viewBox="0 0 120 100"><path d="M18 8L98 6L102 34L96 50L104 70L88 94L22 92L14 60L20 40z" fill="#e6d9b8" stroke="#8a7650"/><g stroke="#4a3a28" stroke-width="2" fill="none"><path d="M28 24Q44 18 60 24T88 22M28 36Q50 30 70 36"/><path d="M28 50Q40 46 52 50"/></g><text x="30" y="76" font-family="Cormorant Garamond,serif" font-size="20" font-style="italic" fill="#7a2331">R.C.</text></svg>`,
+ liv:`<svg viewBox="0 0 120 100"><path d="M10 28Q35 18 60 30Q85 18 110 28V84Q85 74 60 86Q35 74 10 84z" fill="#7a2331" stroke="#c9a85c"/><path d="M16 32Q36 25 58 34V80Q36 72 16 80zM62 34Q84 25 104 32V80Q84 72 62 80z" fill="#e6d9b8"/><g stroke="#8a7650"><path d="M22 42H50M22 50H50M22 58H44M70 42H98M70 50H92"/></g><path d="M72 58L98 56L100 76L74 78z" fill="#f7f0d8" stroke="#8a7650" transform="rotate(-4 86 66)"/><text x="76" y="71" font-size="9" font-family="Cormorant Garamond,serif" fill="#7a2331">22h20</text></svg>`,
+ copo:`<svg viewBox="0 0 120 100"><path d="M34 14H78L74 40Q68 52 58 54V78H72V86H40V78H52V54Q42 52 38 40z" fill="#9fc7c4" fill-opacity=".45" stroke="#cfe9e6"/><path d="M34 14L46 30L54 14L62 30L70 14L78 14" fill="#14211e" stroke="#cfe9e6"/><path d="M80 74L100 64L104 80L88 90z" fill="#e6d9b8" stroke="#8a7650"/><path d="M86 78H98M88 84H96" stroke="#4a3a28"/><g fill="#cfe9e6"><path d="M16 84l8-4 2 6zM26 90l6-2-1 6z"/></g></svg>`
+};
+const SALAS={
+ doc:{nome:'Escritório de Arthur',pista:['Documento rasgado','Arthur escreveu que não podia confiar em alguém de iniciais R.C. novamente.'],
+  novo:['Você entrou no escritório de Arthur. A sala está desorganizada.','Sobre a mesa, um documento rasgado, escrito por Arthur: “Preciso resolver isso antes da meia-noite. Não posso confiar em R.C. novamente.”','O restante foi destruído. As iniciais R.C. podem ser importantes.'],velho:'Você já investigou o escritório. Não há nada de novo por aqui.'},
+ liv:{nome:'Biblioteca',pista:['Anotação no livro','Um papel indica que alguém deveria deixar o livro e ir ao escritório às 22h20.'],
+  novo:['Há vários livros espalhados pelas estantes. Um deles está aberto sobre uma poltrona.','Dentro dele, um papel com uma anotação: “22h20 – deixar o livro e ir ao escritório.”','Não há assinatura, mas o horário parece importante.'],velho:'Você já investigou a biblioteca. Não há nada de novo por aqui.'},
+ copo:{nome:'Cozinha',pista:['Papel na cozinha','O bilhete fala de dinheiro que precisava ser devolvido a Arthur.'],
+  novo:['Perto da pia, há um copo quebrado. Ao lado dos cacos, um pequeno pedaço de papel.','Nele está escrito: “O dinheiro precisa ser devolvido. Arthur não vai esperar mais.”','O papel parece ter sido arrancado de uma carta ou de um bilhete maior.'],velho:'Você já investigou a cozinha. Não há nada de novo por aqui.'}
+};
+
+/* ---------- Interface ---------- */
+function cena(fig,cls,titulo,ps){
+  $('#cena').innerHTML=`<div class="fig ${cls}">${fig}</div><div><h2>${titulo}</h2>${ps.map(p=>`<p>${p}</p>`).join('')}</div>`;
+}
+function sala(k){
+  if(fim)return; const s=SALAS[k], novo=!achou[k]; achou[k]=1;
+  cena(ART[k],'objeto',s.nome,novo?[...s.novo,'<span class="aviso">Pista registrada no quadro.</span>']:[s.velho]);
+  quadro();
+}
+function interrogar(i){
+  if(fim)return; const s=SUS[i], novo=!inter[i]; inter[i]=1;
+  cena(s.svg,'pessoa',`${s.nome}, ${s.papel.toLowerCase()}`,novo?s.fala:[`Você já interrogou ${s.nome}. Não há mais nada a acrescentar.`]);
+  document.querySelectorAll('.sus')[i].classList.add('feito');
+}
+function quadro(){
+  const ks=Object.keys(SALAS);
+  $('#quadro').innerHTML=ks.map(k=>achou[k]?`<div class="bilhete"><h3>${SALAS[k].pista[0]}</h3><p>${SALAS[k].pista[1]}</p></div>`:`<div class="bilhete vazio">Pista ainda não encontrada. Explore os cômodos.</div>`).join('');
+}
+function acusar(){
+  if(fim)return; const d=$('#dlg');
+  d.innerHTML=`<h2>Acusação final</h2><p>Antes de acusar alguém, pense bem.</p><div class="lista">${SUS.map((s,i)=>`<button class="op" data-i="${i}">${s.nome}</button>`).join('')}</div><button class="cancelar" id="cx">Voltar à investigação</button>`;
+  d.showModal();
+  d.querySelectorAll('.op').forEach(b=>b.onclick=()=>veredito(+b.dataset.i));
+  $('#cx').onclick=()=>d.close();
+}
+function veredito(i){
+  const d=$('#dlg'); fim=true;
+  const ok=i===1;
+  d.innerHTML=ok
+   ?`<h2>Caso resolvido</h2><p><b>Parabéns, detetive!</b> Você descobriu que Ricardo Carvalho cometeu o crime.</p><p>As iniciais R.C. no documento apontavam para Ricardo. A discussão sobre dinheiro e o bilhete da cozinha reforçaram a suspeita.</p><p>Ricardo mentiu sobre sua noite na biblioteca. Arthur descobriu que o próprio irmão estava envolvido em algo que ele não poderia mais esconder.</p><p>Você solucionou o Caso 001!</p>`
+   :`<h2>Acusação errada</h2><p>Você acusou ${SUS[i].nome}, mas as evidências não confirmam essa acusação.</p><p>O verdadeiro culpado continua livre. A investigação foi encerrada.</p>`;
+  d.insertAdjacentHTML('beforeend','<p><button class="op" id="again">Jogar de novo</button></p>');
+  $('#again').onclick=()=>location.reload();
+  $('#btnAcusar').disabled=true;
+}
+
+$('#mansao').innerHTML=mansao();
+document.querySelectorAll('.room').forEach(g=>{
+  const go=()=>sala(g.dataset.r);
+  g.addEventListener('click',go);
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
+});
+$('#suspeitos').innerHTML=SUS.map((s,i)=>`<button class="sus" data-i="${i}"><div class="moldura-ret">${s.svg}</div><b>${s.nome}</b>${s.papel}</button>`).join('');
+document.querySelectorAll('.sus').forEach(b=>b.onclick=()=>interrogar(+b.dataset.i));
+$('#btnAcusar').onclick=acusar;
+quadro();
+cena(mansao().replace(/<g class="room"[\s\S]*?<\/g>/g,''),'objeto','A noite do crime',['Arthur Carvalho foi encontrado morto em seu escritório, durante uma festa.','Quatro pessoas estavam na mansão e todas afirmam não ter envolvimento. Investigue os cômodos, interrogue os suspeitos e descubra quem cometeu o crime.','Boa sorte, detetive!']);
+</script>
+</body>
+</html>

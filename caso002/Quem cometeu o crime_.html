@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quem cometeu o crime?</title>
+<link href="https://fonts.googleapis.com/css2?family=Poiret+One&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--noite:#101a18;--parede:#182925;--latao:#c9a85c;--vinho:#7a2331;--papel:#e6d9b8;--tinta:#2b1e12;--texto:#ece3cc;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:radial-gradient(ellipse at top,#1d3530,var(--noite) 70%);color:var(--texto);font:500 19px/1.55 "Cormorant Garamond",Georgia,serif;min-height:100vh}
+main{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+.moldura{border:1px solid var(--latao);outline:1px solid var(--latao);outline-offset:6px;padding:22px 18px;background:rgba(10,18,16,.55)}
+h1,h2,h3{font-family:"Poiret One","Cormorant Garamond",serif;font-weight:400;margin:0;color:var(--latao)}
+h1{font-size:clamp(34px,7vw,64px);text-align:center;line-height:1.05}
+.sub{text-align:center;font-style:italic;margin:6px 0 0}
+.deco{display:block;margin:14px auto;width:min(320px,80%);height:16px}
+h2{font-size:30px;margin-bottom:6px}
+section{margin-top:28px}
+.cena-img{background:#0b1311;border:1px solid var(--latao)}
+.cena-img svg{display:block;width:100%;height:auto}
+.room{cursor:pointer}
+.room rect{fill:#f2c96b;opacity:.85;transition:opacity .2s}
+.room:hover rect,.room:focus rect{opacity:1;stroke:#fff3c4;stroke-width:2}
+.room:focus{outline:none}
+.room text{fill:var(--latao);font:italic 16px "Cormorant Garamond",serif;text-anchor:middle}
+.dica{font-style:italic;text-align:center;margin:8px 0 0;opacity:.85}
+#cena{display:grid;grid-template-columns:170px 1fr;gap:20px;align-items:start;margin-top:18px;padding:18px;background:var(--parede);border-left:4px solid var(--vinho)}
+#cena p{margin:.4em 0}
+.fig svg{width:100%;height:auto;display:block}
+.ret{filter:sepia(.55) contrast(.95)}
+.fig.pessoa{border-radius:50%/46%;overflow:hidden;border:3px double var(--latao);background:#d8c9a3}
+.fig.objeto{background:#14211e;border:1px solid var(--latao);padding:6px}
+.aviso{font-style:italic;color:var(--latao)}
+.suspeitos{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:12px}
+.sus{background:none;border:1px solid var(--latao);color:inherit;font:inherit;padding:10px 8px 12px;cursor:pointer;text-align:center;transition:background .2s}
+.sus:hover,.sus:focus-visible{background:rgba(201,168,92,.14);outline:2px solid var(--latao);outline-offset:2px}
+.sus .moldura-ret{border-radius:50%/46%;overflow:hidden;border:3px double var(--latao);background:#d8c9a3;margin:0 auto 8px;width:78%}
+.sus svg{display:block;width:100%;height:auto}
+.sus b{display:block;font-family:"Poiret One",serif;font-size:23px;line-height:1.1;color:var(--latao);font-weight:400}
+.sus small{display:block;font-size:15px;opacity:.8}
+.sus.feito{opacity:.6}
+.quadro{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;margin-top:12px;padding:18px;background:#2a1b13;border:6px solid #4a3322}
+.bilhete{background:var(--papel);color:var(--tinta);padding:14px 12px;min-height:130px;transform:rotate(-1.2deg);box-shadow:0 3px 6px rgba(0,0,0,.5);position:relative}
+.bilhete:nth-child(even){transform:rotate(1.3deg)}
+.bilhete::before{content:"";position:absolute;top:-7px;left:50%;width:14px;height:14px;border-radius:50%;background:var(--vinho);box-shadow:inset -2px -2px 0 rgba(0,0,0,.35)}
+.bilhete h3{color:var(--vinho);font-size:21px;margin-bottom:4px}
+.bilhete p{margin:0;font-size:17px;line-height:1.35}
+.bilhete.vazio{grid-column:1/-1;min-height:80px;background:transparent;border:2px dashed #6b523a;box-shadow:none;color:#a58c6c;font-style:italic;display:grid;place-items:center;text-align:center;transform:none}
+.bilhete.vazio::before{display:none}
+.acoes{text-align:center;margin-top:30px}
+button.acusar,dialog button.op{font:700 22px "Cormorant Garamond",serif;background:var(--vinho);color:#f6ecd3;border:2px solid var(--latao);padding:10px 30px;cursor:pointer}
+button.acusar:hover,button.acusar:focus-visible,dialog button.op:hover,dialog button.op:focus-visible{background:#9a2c3e;outline:2px solid #fff3c4;outline-offset:2px}
+button.acusar:disabled{opacity:.5;cursor:default}
+dialog{background:var(--papel);color:var(--tinta);border:3px double var(--vinho);max-width:560px;width:calc(100% - 32px);max-height:90vh;overflow:auto;padding:24px;font:500 19px/1.5 "Cormorant Garamond",serif}
+dialog::backdrop{background:rgba(0,0,0,.75)}
+dialog h2{color:var(--vinho)}
+dialog .lista{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+dialog button.op{font-size:20px;padding:8px}
+dialog .cancelar{background:none;border:0;color:var(--tinta);text-decoration:underline;font:inherit;cursor:pointer}
+dialog .prox{font-style:italic;color:var(--vinho)}
+#cartela{position:fixed;inset:0;z-index:50;background:var(--noite);display:grid;place-items:center;text-align:center;opacity:0;pointer-events:none;transition:opacity .8s;padding:24px}
+#cartela.on{opacity:1;pointer-events:auto}
+#cartela div{border:1px solid var(--latao);outline:1px solid var(--latao);outline-offset:6px;padding:36px 28px}
+#cartela h2{font-size:clamp(30px,7vw,56px)}
+#cartela p{margin:6px 0;font-style:italic;color:var(--texto)}
+@media(max-width:700px){#cena{grid-template-columns:1fr}.fig{max-width:170px}.room text{font-size:21px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<div class="moldura">
+<h1>Quem cometeu o crime?</h1>
+<p class="sub" id="sub"></p>
+<svg class="deco" viewBox="0 0 320 16" aria-hidden="true"><path d="M0 8H140M180 8H320" stroke="#c9a85c"/><path d="M160 1l8 7-8 7-8-7z" fill="#c9a85c"/></svg>
+<div class="cena-img" id="mansao"></div>
+<p class="dica" id="dica"></p>
+<div id="cena" aria-live="polite"></div>
+<section><h2>Suspeitos</h2><div class="suspeitos" id="suspeitos"></div></section>
+<section><h2>Quadro de pistas</h2><div class="quadro" id="quadro"></div></section>
+<div class="acoes"><button class="acusar" id="btnAcusar">Fazer acusação</button></div>
+</div>
+</main>
+<dialog id="dlg"></dialog>
+<div id="cartela" aria-hidden="true"><div><p>Caso 002</p><h2>O último trem de Santa Cecília</h2><p>Ano de 1898</p></div></div>
+
+<script>
+const $=s=>document.querySelector(s);
+let C=0,fim=false,trocando=false,est;
+
+/* ---------- Cenários ---------- */
+const sala=(i,x,y,w,h,t,lx,ly)=>`<g class="room" tabindex="0" role="button" aria-label="Investigar: ${t}" data-r="${i}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/><path d="M${x+w/2} ${y}v${h}M${x} ${y+h/2}h${w}" stroke="#3a2a14" stroke-width="3"/><text x="${lx}" y="${ly}">${t}</text></g>`;
+const ceu=`<defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#08100e"/><stop offset="1" stop-color="#27453e"/></linearGradient></defs><rect width="720" height="320" fill="url(#c)"/><circle cx="640" cy="52" r="26" fill="#e9dcae"/><circle cx="650" cy="46" r="24" fill="#10201c" opacity=".25"/><g fill="#e9dcae"><circle cx="60" cy="40" r="1.5"/><circle cx="200" cy="30" r="1.5"/><circle cx="330" cy="50" r="1.5"/><circle cx="470" cy="25" r="1.5"/><circle cx="540" cy="60" r="1.5"/><circle cx="120" cy="80" r="1.5"/></g>`;
+function mansao(){
+  let j='';
+  for(let x of [110,150,200,505,550,590]) for(let y of [165,205]) j+=`<rect x="${x}" y="${y}" width="22" height="30" fill="#2c4a43"/>`;
+  for(let x of [275,300,430]) for(let y of [135,185,215]) if(!(x==300&&y==135)) j+=`<rect x="${x}" y="${y}" width="20" height="${y==215?35:30}" fill="#2c4a43"/>`;
+  return `<svg viewBox="0 0 720 320" role="img" aria-label="Fachada da Mansão Carvalho à noite">${ceu}
+<g fill="#0b1513"><ellipse cx="40" cy="260" rx="60" ry="55"/><ellipse cx="690" cy="262" rx="62" ry="55"/><rect x="90" y="160" width="170" height="110"/><rect x="250" y="115" width="220" height="155"/><rect x="460" y="160" width="170" height="110"/><polygon points="250,115 360,62 470,115"/><polygon points="90,160 175,120 260,160"/><polygon points="460,160 545,120 630,160"/><rect x="410" y="70" width="18" height="40"/><rect x="226" y="262" width="270" height="14"/></g>
+<path d="M0 275H720V320H0z" fill="#0a1210"/><path d="M335 270V225a25 25 0 0150 0v45z" fill="#3a1f17" stroke="#c9a85c"/><g>${j}</g>
+${sala(0,322,132,76,48,"Escritório",360,104)}${sala(1,120,182,100,50,"Biblioteca",170,150)}${sala(2,500,182,100,50,"Cozinha",550,150)}</svg>`;
+}
+function trem(){
+  const nomes=["Cabine","Restaurante","Passageiros","Bagagens","Funcionários"];
+  let v='';
+  nomes.forEach((n,i)=>{const x=100+i*124;
+    v+=`<path d="M${x-2} 165Q${x+59} 145 ${x+120} 165z" fill="#0b1513"/><rect x="${x}" y="165" width="118" height="80" fill="#0b1513" stroke="#c9a85c" stroke-opacity=".4"/><rect x="${x+8}" y="182" width="16" height="30" fill="#2c4a43"/><rect x="${x+94}" y="182" width="16" height="30" fill="#2c4a43"/><circle cx="${x+22}" cy="252" r="10" fill="#0b1513" stroke="#5a4a2a"/><circle cx="${x+96}" cy="252" r="10" fill="#0b1513" stroke="#5a4a2a"/>`+sala(i,x+34,180,50,36,n,x+59,138);});
+  return `<svg viewBox="0 0 720 320" role="img" aria-label="Trem de Santa Cecília à noite">${ceu}
+<path d="M0 250Q120 200 240 235T480 225T720 240V320H0z" fill="#0c1816"/>
+<path d="M0 275H720V320H0z" fill="#0a1210"/><path d="M0 270H720M0 280H720" stroke="#5a4a2a" stroke-width="2"/>
+<g fill="#0b1513"><rect x="6" y="190" width="70" height="52"/><rect x="14" y="150" width="14" height="44"/><rect x="48" y="166" width="40" height="76"/><rect x="42" y="160" width="52" height="8"/><circle cx="24" cy="252" r="12"/><circle cx="62" cy="252" r="12"/></g>
+<g fill="#e9dcae" opacity=".18"><ellipse cx="22" cy="132" rx="18" ry="10"/><ellipse cx="40" cy="112" rx="22" ry="12"/><ellipse cx="64" cy="94" rx="26" ry="13"/></g>${v}</svg>`;
+}
+
+/* ---------- Retratos ---------- */
+function rosto(c,hair,extra,boca){
+  return `<svg class="ret" viewBox="0 0 120 150"><rect width="120" height="150" fill="#cdbb90"/><path d="M8 150Q14 108 60 104Q106 108 112 150z" fill="${c.roupa}"/>${extra[0]||''}<rect x="52" y="86" width="16" height="22" fill="${c.pele}"/><ellipse cx="60" cy="62" rx="26" ry="32" fill="${c.pele}"/>${hair}<circle cx="50" cy="62" r="2.5" fill="#222"/><circle cx="70" cy="62" r="2.5" fill="#222"/><path d="M44 55Q50 52 56 55M64 55Q70 52 76 55" stroke="#3a2a1c" fill="none" stroke-width="2"/><path d="M60 64v10" stroke="#00000030" stroke-width="2"/>${boca}${extra[1]||''}</svg>`;
+}
+const boca='<path d="M52 82Q60 87 68 82" stroke="#6a3b2a" fill="none" stroke-width="2"/>';
+const labio='<path d="M52 82Q60 86 68 82" stroke="#a03a4a" fill="none" stroke-width="3"/>';
+const camisa='<path d="M46 104L60 150L74 104z" fill="#efe6cf"/>';
+const gravata='<path d="M50 108L60 113L50 119zM70 108L60 113L70 119z" fill="#111"/>';
+
+/* ---------- Casos ---------- */
+const ART={
+ doc:`<svg viewBox="0 0 120 100"><path d="M18 8L98 6L102 34L96 50L104 70L88 94L22 92L14 60L20 40z" fill="#e6d9b8" stroke="#8a7650"/><g stroke="#4a3a28" stroke-width="2" fill="none"><path d="M28 24Q44 18 60 24T88 22M28 36Q50 30 70 36M28 50Q40 46 52 50"/></g><text x="30" y="76" font-family="Cormorant Garamond,serif" font-size="20" font-style="italic" fill="#7a2331">R.C.</text></svg>`,
+ liv:`<svg viewBox="0 0 120 100"><path d="M10 28Q35 18 60 30Q85 18 110 28V84Q85 74 60 86Q35 74 10 84z" fill="#7a2331" stroke="#c9a85c"/><path d="M16 32Q36 25 58 34V80Q36 72 16 80zM62 34Q84 25 104 32V80Q84 72 62 80z" fill="#e6d9b8"/><path d="M22 42H50M22 50H50M22 58H44M70 42H98M70 50H92" stroke="#8a7650"/><path d="M72 58L98 56L100 76L74 78z" fill="#f7f0d8" stroke="#8a7650" transform="rotate(-4 86 66)"/><text x="76" y="71" font-size="9" font-family="Cormorant Garamond,serif" fill="#7a2331">22h20</text></svg>`,
+ copo:`<svg viewBox="0 0 120 100"><path d="M34 14H78L74 40Q68 52 58 54V78H72V86H40V78H52V54Q42 52 38 40z" fill="#9fc7c4" fill-opacity=".45" stroke="#cfe9e6"/><path d="M34 14L46 30L54 14L62 30L70 14L78 14" fill="#14211e" stroke="#cfe9e6"/><path d="M80 74L100 64L104 80L88 90z" fill="#e6d9b8" stroke="#8a7650"/><path d="M86 78H98M88 84H96" stroke="#4a3a28"/><path d="M16 84l8-4 2 6zM26 90l6-2-1 6z" fill="#cfe9e6"/></svg>`,
+ cabine:`<svg viewBox="0 0 120 100"><rect x="10" y="50" width="100" height="32" fill="#3a2a22" stroke="#c9a85c"/><rect x="14" y="38" width="42" height="16" rx="5" fill="#e6d9b8"/><path d="M62 54l10 14M74 52l12 16M88 56l8 12" stroke="#8a2330" stroke-width="3"/><circle cx="90" cy="74" r="4" fill="#8a2330"/><path d="M10 90H110" stroke="#c9a85c"/></svg>`,
+ bilhete:`<svg viewBox="0 0 120 100"><path d="M16 20L44 10L80 16L106 12L100 50L108 78L70 90L38 84L12 88L20 54z" fill="#e6d9b8" stroke="#8a7650"/><path d="M30 18L40 70M80 20L70 80" stroke="#c9b98f"/><text x="26" y="42" font-size="13" font-family="Cormorant Garamond,serif" font-style="italic" fill="#7a2331">Você vai pagar</text><text x="34" y="60" font-size="13" font-family="Cormorant Garamond,serif" font-style="italic" fill="#7a2331">pelo que fez.</text></svg>`,
+ marcas:`<svg viewBox="0 0 120 100"><rect width="120" height="100" fill="#2a1d14"/><path d="M0 25H120M0 50H120M0 75H120" stroke="#1a110b" stroke-width="2"/><path d="M10 70Q50 60 70 40T110 30" stroke="#6b5a45" stroke-width="12" fill="none" opacity=".7"/><path d="M96 20l16 10-14 10" stroke="#c9a85c" stroke-width="3" fill="none"/><ellipse cx="30" cy="30" rx="6" ry="10" fill="#4a3a2a" transform="rotate(-20 30 30)"/><ellipse cx="48" cy="82" rx="6" ry="10" fill="#4a3a2a" transform="rotate(10 48 82)"/></svg>`,
+ mala:`<svg viewBox="0 0 120 100"><rect x="16" y="30" width="88" height="54" rx="6" fill="#5a3a22" stroke="#c9a85c" stroke-width="2"/><path d="M46 30V20H74V30" fill="none" stroke="#c9a85c" stroke-width="3"/><path d="M16 56H104" stroke="#2b1a0e" stroke-width="2"/><rect x="54" y="52" width="12" height="10" fill="#c9a85c"/><path d="M26 70H94" stroke="#e6d9b8" stroke-dasharray="3 3"/></svg>`,
+ arma:`<svg viewBox="0 0 120 100"><path d="M20 78L78 30L84 38L28 86z" fill="#cfd6d6" stroke="#8a9494" transform="rotate(-6 50 56)"/><path d="M74 24L92 40L86 46L68 30z" fill="#c9a85c"/><path d="M84 36L108 58L100 66L78 44z" fill="#efe7da" stroke="#b9a98a"/><path d="M30 76l14-12" stroke="#6b2a2a" stroke-width="3"/></svg>`,
+ func:`<svg viewBox="0 0 120 100"><circle cx="40" cy="50" r="28" fill="#efe6cf" stroke="#c9a85c" stroke-width="4"/><path d="M40 50L29 41M40 50L59 61" stroke="#2b1e12" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="50" r="2.5" fill="#7a2331"/><path d="M40 16V8" stroke="#c9a85c" stroke-width="5"/><g transform="rotate(8 92 56)"><rect x="72" y="30" width="38" height="52" fill="#e6d9b8" stroke="#8a7650"/><text x="78" y="52" font-size="17" font-family="Cormorant Garamond,serif" font-style="italic" fill="#7a2331">I.</text><text x="92" y="74" font-size="15" font-family="Cormorant Garamond,serif" fill="#b9a98a">C.</text></g></svg>`
+};
+const P1={doc:["Documento rasgado","Arthur escreveu que não podia confiar em alguém de iniciais R.C. novamente."],liv:["Anotação no livro","Um papel indica que alguém deveria deixar o livro e ir ao escritório às 22h20."],copo:["Papel na cozinha","O bilhete fala de dinheiro que precisava ser devolvido a Arthur."]};
+const P2={mancha:["Cabine de Augusto","Sinais de luta e vestígios de sangue. O ferimento foi causado por algo fino e pontiagudo."],bilhete:["Bilhete ameaçador","No restaurante: “Você vai pagar pelo que fez.”"],marcas:["Marcas na passagem","Marcas recentes seguem em direção ao vagão de bagagens."],mala:["Mala mexida","O forro de uma mala esconde um compartimento que foi aberto às pressas."],arma:["Punhal de madrepérola","Um punhal fino estava no compartimento escondido. Pode corresponder ao ferimento."],relogio:["Relógio de bolso","O relógio encontrado no vagão dos funcionários parou às 22h20."],estojo:["Estojo de partituras","Um estojo de partituras foi escondido num espaço pouco visível."],encontro:["Bilhete de encontro","Fala de um encontro depois da troca de turno e traz as letras I e C. Ainda não se sabe quem escreveu, nem a natureza da relação."]};
+
+const CASOS=[
+{sub:"Caso 001 – O mistério da Mansão Carvalho",dica:"Toque numa janela iluminada para investigar um cômodo.",scene:mansao,
+ introT:"A noite do crime",intro:["Arthur Carvalho foi encontrado morto em seu escritório, durante uma festa.","Quatro pessoas estavam na mansão e todas afirmam não ter envolvimento. Investigue os cômodos, interrogue os suspeitos e descubra quem cometeu o crime.","Boa sorte, detetive!"],
+ pistas:P1,vazio:"Você ainda não encontrou nenhuma pista. Explore os cômodos da mansão primeiro.",encerra:true,culpado:1,
+ locais:[
+  {nome:"Escritório de Arthur",art:ART.doc,velho:"Você já investigou o escritório. Não há nada de novo por aqui.",etapas:[{pistas:["doc"],texto:["Você entrou no escritório de Arthur. A sala está desorganizada.","Sobre a mesa, um documento rasgado, escrito por Arthur: “Preciso resolver isso antes da meia-noite. Não posso confiar em R.C. novamente.”","O restante foi destruído. As iniciais R.C. podem ser importantes."]}]},
+  {nome:"Biblioteca",art:ART.liv,velho:"Você já investigou a biblioteca. Não há nada de novo por aqui.",etapas:[{pistas:["liv"],texto:["Há vários livros espalhados pelas estantes. Um deles está aberto sobre uma poltrona.","Dentro dele, um papel com uma anotação: “22h20 – deixar o livro e ir ao escritório.”","Não há assinatura, mas o horário parece importante."]}]},
+  {nome:"Cozinha",art:ART.copo,velho:"Você já investigou a cozinha. Não há nada de novo por aqui.",etapas:[{pistas:["copo"],texto:["Perto da pia, há um copo quebrado. Ao lado dos cacos, um pequeno pedaço de papel.","Nele está escrito: “O dinheiro precisa ser devolvido. Arthur não vai esperar mais.”","O papel parece ter sido arrancado de uma carta ou de um bilhete maior."]}]}],
+ pessoas:[
+  {nome:"Helena",papel:"Governanta",svg:rosto({pele:"#e3c3a0",roupa:"#2d2d33"},'<path d="M33 62Q30 28 60 28Q90 28 87 62Q80 42 60 42Q40 42 33 62z" fill="#8c8c8c"/><circle cx="60" cy="22" r="11" fill="#8c8c8c"/>',['<path d="M44 106L60 128L76 106z" fill="#f1ead8"/>',''],boca),
+   falas:[["“Eu estava preparando o jantar naquela noite. Por volta das 22h30, ouvi um barulho vindo do escritório de Arthur. Não fui verificar porque estava ocupada na cozinha.”","“Arthur parecia preocupado nos últimos dias, mas nunca me contou o motivo.”"]]},
+  {nome:"Ricardo",papel:"Irmão de Arthur",svg:rosto({pele:"#deb893",roupa:"#3b3b44"},'<path d="M33 58Q32 28 60 28Q88 28 87 58Q78 42 60 42Q42 42 33 58z" fill="#2b2118"/>',[camisa,'<path d="M46 76Q60 68 74 76Q60 82 46 76z" fill="#2b2118"/><path d="M50 108L60 113L50 118zM70 108L60 113L70 118z" fill="#5a1620"/>'],''),
+   falas:[["“Eu estava na biblioteca lendo um livro. Não tinha motivo para entrar no escritório naquela noite.”","“É verdade que Arthur e eu discutimos por causa de dinheiro, mas isso é um assunto de família.”","“Eu jamais faria algo contra meu próprio irmão.”"]]},
+  {nome:"Beatriz",papel:"Sobrinha de Arthur",svg:rosto({pele:"#efcfb0",roupa:"#5b2b46"},'<path d="M30 84Q24 24 60 24Q96 24 90 84L80 84Q84 46 60 44Q36 46 40 84z" fill="#4e2716"/>',['','<g fill="#f3efe4"><circle cx="46" cy="106" r="3"/><circle cx="53" cy="110" r="3"/><circle cx="60" cy="112" r="3"/><circle cx="67" cy="110" r="3"/><circle cx="74" cy="106" r="3"/></g>'],labio),
+   falas:[["“Eu estava no jardim quando tudo aconteceu. Precisava de um pouco de ar.”","“Meu tio estava estranho naquela noite e parecia desconfiar de alguém.”","“Não sei quem poderia querer machucá-lo.”"]]},
+  {nome:"Daniel",papel:"Mordomo",svg:rosto({pele:"#e0bd9a",roupa:"#16161a"},'<path d="M34 66Q31 48 40 44L41 62zM86 66Q89 48 80 44L79 62z" fill="#b9b9b9"/>',[camisa,gravata],boca),
+   falas:[["“Eu estava organizando o salão para o encerramento da festa.”","“Passei pelo corredor do escritório por volta das 22h45, mas a porta estava fechada. Não vi ninguém entrando ou saindo.”"]]}],
+ ok:`<h2>Caso resolvido</h2><p><b>Parabéns, detetive!</b> Você descobriu que Ricardo Carvalho cometeu o crime.</p><p>As iniciais R.C. no documento apontavam para Ricardo. A discussão sobre dinheiro e o bilhete da cozinha reforçaram a suspeita.</p><p>Ricardo mentiu sobre sua noite na biblioteca. Arthur descobriu que o próprio irmão estava envolvido em algo que ele não poderia mais esconder.</p><p>Você solucionou o Caso 001!</p>`,
+ erra:n=>`<p>Você acusou ${n}, mas as evidências não confirmam essa acusação.</p><p>O verdadeiro culpado continua livre. A investigação foi encerrada.</p>`},
+
+{sub:"Caso 002 – O último trem de Santa Cecília · 1898",dica:"Toque numa janela iluminada para investigar um vagão.",scene:trem,
+ introT:"A viagem noturna",intro:["Augusto Vasconcelos, um rico empresário, foi encontrado morto em sua cabine durante uma viagem noturna.","Sete pessoas estavam a bordo e todas possuem algo a esconder. Investigue os passageiros, os vagões e as circunstâncias do crime.","Cada passageiro pode ser entrevistado duas vezes."],
+ pistas:P2,vazio:"Você ainda não encontrou pistas. Investigue os vagões primeiro.",encerra:false,culpado:3,
+ locais:[
+  {nome:"Cabine de Augusto",art:ART.cabine,velho:"Você já investigou esse vagão. Não há nada de novo por aqui.",etapas:[{pistas:["mancha"],texto:["A cabine está parcialmente desorganizada. Há sinais de que houve uma luta.","Você encontra marcas na madeira próxima à cama e vestígios de sangue. O ferimento parece ter sido causado por um objeto estreito e pontiagudo.","A posição dos objetos sugere que Augusto tentou se defender de alguém próximo."]}]},
+  {nome:"Vagão-restaurante",art:ART.bilhete,velho:"Você já investigou esse vagão. Não há nada de novo por aqui.",etapas:[{pistas:["bilhete"],texto:["Entre os assentos, você encontra um bilhete amassado.","O papel traz uma frase: “Você vai pagar pelo que fez.”","Não há assinatura. A letra parece ter sido escrita com muita pressa."]}]},
+  {nome:"Vagão de passageiros",art:ART.marcas,velho:"Você já investigou esse vagão. Não há nada de novo por aqui.",etapas:[{pistas:["marcas"],texto:["Você observa marcas recentes perto da porta de comunicação.","A poeira foi removida em uma faixa estreita, como se alguém tivesse passado carregando um objeto comprido.","As marcas seguem na direção do vagão de bagagens."]}]},
+  {nome:"Vagão de bagagens",art:[ART.mala,ART.arma],velho:"Você já investigou esse vagão. Não há nada de novo por aqui.",etapas:[
+    {pistas:["mala"],texto:["Uma mala parece ter sido aberta às pressas.","Ao examinar o forro, você percebe uma costura diferente das demais. Há um pequeno compartimento escondido.","A abertura está emperrada. Parece que alguém tentou fechá-la rapidamente.","<span class='aviso'>Volte a este vagão para examinar o compartimento.</span>"]},
+    {pistas:["arma"],texto:["Com cuidado, você consegue abrir o compartimento encontrado na mala.","Dentro dele há um punhal fino, com cabo de madrepérola.","A lâmina foi limpa, mas há vestígios escuros perto da guarda. O objeto pode corresponder ao ferimento encontrado na cabine de Augusto.","O punhal estava escondido. Isso prova que alguém tentou retirar a arma de circulação, mas não revela quem a colocou ali."]}]},
+  {nome:"Vagão dos funcionários",art:ART.func,velho:"Você já investigou esse vagão. Não há nada de novo por aqui.",etapas:[{pistas:["relogio","estojo","encontro"],texto:["O local está quase vazio.","Você encontra um relógio de bolso esquecido perto de um armário. Os ponteiros estão parados às 22h20.","Num espaço pouco visível, há um estojo de partituras. Entre as folhas, um pequeno bilhete dobrado: “Depois da última troca de turno. No mesmo lugar de sempre. Não podemos continuar nos arriscando.”","Apenas uma inicial aparece no papel: I. No verso, há uma letra quase apagada: C.","O bilhete sugere um encontro secreto, mas ainda não revela quem o marcou."]}]}],
+ pessoas:[
+  {nome:"Antonio Ferraz",papel:"Sócio",svg:rosto({pele:"#dfb994",roupa:"#3a3330"},'<path d="M34 60Q33 32 60 32Q87 32 86 60Q78 44 60 44Q42 44 34 60z" fill="#6e6e6e"/>',[camisa,'<path d="M44 76Q52 70 60 75Q68 70 76 76Q68 80 60 77Q52 80 44 76z" fill="#6e6e6e"/><rect x="40" y="12" width="40" height="26" fill="#1a1a1a"/><rect x="32" y="36" width="56" height="6" fill="#1a1a1a"/>'],''),
+   falas:[["“Augusto era meu amigo e parceiro de negócios. Discutimos algumas vezes, mas nada que justificasse uma tragédia.”"],["“Augusto investiu dinheiro em um projeto ligado a uma pianista. O negócio fracassou e houve uma perda considerável. Ele dizia que alguém teria de responder por aquele prejuízo.”"]]},
+  {nome:"Cecilia Albuquerque",papel:"Esposa de Augusto",svg:rosto({pele:"#efd2b6",roupa:"#6b2a3f"},'<path d="M32 62Q28 26 60 24Q92 26 88 62Q82 40 60 40Q38 40 32 62z" fill="#3b2418"/><circle cx="60" cy="20" r="9" fill="#3b2418"/>',['','<circle cx="34" cy="76" r="3" fill="#c9a85c"/><circle cx="86" cy="76" r="3" fill="#c9a85c"/><path d="M40 28Q60 10 80 28Z" fill="#2e4a3f"/>'],labio),
+   falas:[["“Augusto era meu marido. Nosso casamento não estava bem, mas eu jamais desejaria sua morte.”"],["“Augusto vinha escondendo problemas financeiros de mim. Recebeu uma carta pouco antes da viagem e ficou bastante nervoso. Ele mencionou uma mulher, mas não quis dizer o nome.”"]]},
+  {nome:"Henrique Velanza",papel:"Médico",svg:rosto({pele:"#dcb794",roupa:"#2f3a46"},'<path d="M33 58Q32 30 60 30Q88 28 87 58Q78 42 60 42Q42 42 33 58z" fill="#cfcfcf"/>',[camisa,'<path d="M38 74Q40 98 60 100Q80 98 82 74Q72 86 60 86Q48 86 38 74z" fill="#cfcfcf"/><circle cx="50" cy="62" r="8" fill="none" stroke="#3a2a1c" stroke-width="1.5"/><circle cx="70" cy="62" r="8" fill="none" stroke="#3a2a1c" stroke-width="1.5"/>'],''),
+   falas:[["“Sou médico e conhecia Augusto. Quando o encontrei, ele já estava morto.”"],["“A lesão não parece ter sido causada por um objeto grande. O ferimento é compatível com um instrumento estreito e pontiagudo. A vítima provavelmente estava próxima do agressor quando foi atingida.”"]]},
+  {nome:"Isabel Montenegro",papel:"Pianista",svg:rosto({pele:"#f0d6ba",roupa:"#1d2a4a"},'<path d="M31 80Q26 24 60 24Q94 24 89 80L80 80Q84 46 60 44Q36 46 40 80z" fill="#1c1410"/>',['','<circle cx="82" cy="34" r="6" fill="#9a2c3e"/>'],labio),
+   falas:[["“Sou pianista. Estava viajando para uma apresentação. Conhecia Augusto apenas de vista.”"],["“Augusto era um homem difícil. Ele investiu em um projeto musical meu, mas o negócio fracassou. Perdi muito dinheiro naquela época. Isso não significa que eu o tenha matado.”","<span class='aviso'>Ao terminar, Isabel evita olhar diretamente para você.</span>"]]},
+  {nome:"Thomaz Azevedo",papel:"Advogado",svg:rosto({pele:"#e2bf9c",roupa:"#22262e"},'<path d="M34 60Q33 32 60 32Q87 32 86 60Q80 46 60 44Q40 46 34 60z" fill="#4a3322"/>',[camisa,gravata+'<circle cx="50" cy="62" r="6" fill="none" stroke="#c9a85c"/><circle cx="70" cy="62" r="6" fill="none" stroke="#c9a85c"/><path d="M56 62h8" stroke="#c9a85c"/>'],boca),
+   falas:[["“Sou advogado e conhecia Augusto. Ele tinha assuntos jurídicos pendentes.”"],["“Augusto estava envolvido em uma disputa financeira. Havia um contrato de investimento que terminou em prejuízo para ele. A outra parte era uma artista, mas não posso revelar mais sem provas.”"]]},
+  {nome:"Olivia Duarte",papel:"Jornalista",svg:rosto({pele:"#edcdb0",roupa:"#41503a"},'<path d="M31 70Q26 26 60 26Q94 26 89 70L82 66Q84 46 60 44Q36 46 38 66z" fill="#7a4a2a"/>',['','<path d="M34 34Q60 8 86 34Q60 28 34 34z" fill="#222"/><path d="M80 28l10-8" stroke="#9a2c3e" stroke-width="3"/>'],boca),
+   falas:[["“Sou jornalista. Estava viajando para investigar uma história sobre empresários.”"],["“Ouvi comentários sobre Augusto e uma pessoa ligada à música. Também ouvi que um funcionário do trem estava sempre por perto dessa pessoa. Não consegui descobrir o motivo.”"]]},
+  {nome:"Caio",papel:"Funcionário do trem",svg:rosto({pele:"#e6c29e",roupa:"#1f2d44"},'<path d="M35 56Q34 34 60 33Q86 34 85 56Q76 44 60 44Q44 44 35 56z" fill="#2a1b10"/>',['','<g fill="#c9a85c"><circle cx="52" cy="122" r="2.5"/><circle cx="68" cy="122" r="2.5"/><circle cx="60" cy="134" r="2.5"/></g><path d="M36 42Q60 14 84 42z" fill="#1f2d44"/><rect x="34" y="40" width="52" height="5" fill="#111"/>'],boca),
+   falas:[["“Sou funcionário do trem. Conheço a rotina dos vagões e estava trabalhando naquela noite.”"],[()=>["“Conheço cada corredor deste trem. Sei os horários dos funcionários e os momentos em que os vagões ficam vazios.”",est.a.encontro?"Ao ver o bilhete encontrado no estojo, Caio perde a cor por um instante. “Não sei de quem é essa letra. Deve ter sido deixado por algum passageiro.”":"Ao ser questionado sobre a cabine de Augusto, Caio hesita. “Não tenho nada a esconder.”"]]]}],
+ ok:`<h2>Caso resolvido</h2><p><b>Parabéns, detetive!</b> Isabel Montenegro foi a responsável pela morte de Augusto Vasconcelos.</p><p>Augusto havia investido no projeto musical de Isabel. Quando o negócio fracassou, ela perdeu muito dinheiro. A disputa financeira se transformou em ressentimento e desejo de vingança.</p><p>Mas Isabel não agiu sozinha. Caio conhecia os horários, os corredores e os compartimentos do trem. Ele facilitou a movimentação e ajudou a esconder o punhal.</p><p>O bilhete com as letras I e C revelou que os dois mantinham um relacionamento secreto. Caio ajudou Isabel porque estava apaixonado por ela.</p><p>O relógio parado, as marcas nos corredores, o compartimento escondido e as mentiras dos dois ajudaram a reconstruir o crime.</p><p>Você solucionou o Caso 002!</p>`,
+ erra:n=>`<p>Você acusou ${n}, mas as evidências ainda não sustentam essa conclusão.</p><p>A investigação continua. Reavalie as pistas.</p>`}
+];
+
+/* ---------- Interface ---------- */
+function cena(fig,cls,titulo,ps){
+  $('#cena').innerHTML=`<div class="fig ${cls}">${fig}</div><div><h2>${titulo}</h2>${ps.map(p=>`<p>${p}</p>`).join('')}</div>`;
+}
+function visitar(i){
+  if(fim)return; const c=CASOS[C], l=c.locais[i], n=est.v[i]||0, art=k=>Array.isArray(l.art)?l.art[Math.min(k,l.art.length-1)]:l.art;
+  if(n<l.etapas.length){
+    const e=l.etapas[n]; e.pistas.forEach(k=>est.a[k]=1); est.v[i]=n+1;
+    cena(art(n),'objeto',l.nome,[...e.texto,`<span class="aviso">${e.pistas.length>1?"Pistas registradas":"Pista registrada"} no quadro.</span>`]); quadro();
+  } else cena(art(n),'objeto',l.nome,[l.velho]);
+}
+function interrogar(i){
+  if(fim)return; const p=CASOS[C].pessoas[i], n=est.e[i]||0, t=p.falas.length;
+  if(n<t){
+    est.e[i]=n+1;
+    const f=p.falas[n].flatMap(x=>typeof x==="function"?x():[x]);
+    cena(p.svg,'pessoa',`${p.nome}, ${p.papel.toLowerCase()}`,f);
+    contadores();
+  } else cena(p.svg,'pessoa',p.nome,[t>1?"Você já realizou as duas entrevistas com esse passageiro.":`Você já interrogou ${p.nome}. Não há mais nada a acrescentar.`]);
+}
+function contadores(){
+  const c=CASOS[C];
+  document.querySelectorAll(".sus").forEach((b,i)=>{const n=est.e[i]||0,t=c.pessoas[i].falas.length;
+    if(t>1)b.querySelector("small").textContent=`Entrevistas ${n}/${t}`; b.classList.toggle("feito",n>=t);});
+}
+function quadro(){
+  const c=CASOS[C], ks=Object.keys(c.pistas).filter(k=>est.a[k]);
+  $("#quadro").innerHTML=ks.length?ks.map(k=>`<div class="bilhete"><h3>${c.pistas[k][0]}</h3><p>${c.pistas[k][1]}</p></div>`).join(""):`<div class="bilhete vazio">${c.vazio}</div>`;
+}
+function acusar(){
+  if(fim)return; const d=$("#dlg"), c=CASOS[C];
+  d.innerHTML=`<h2>Acusação final</h2><p>Antes de acusar alguém, pense bem.</p><div class="lista">${c.pessoas.map((p,i)=>`<button class="op" data-i="${i}">${p.nome}</button>`).join("")}</div><button class="cancelar" id="cx">Voltar à investigação</button>`;
+  d.showModal();
+  d.querySelectorAll(".op").forEach(b=>b.onclick=()=>veredito(+b.dataset.i));
+  $("#cx").onclick=()=>d.close();
+}
+function veredito(i){
+  const d=$("#dlg"), c=CASOS[C];
+  if(i===c.culpado){
+    fim=true; $("#btnAcusar").disabled=true; d.innerHTML=c.ok;
+    if(C<CASOS.length-1){
+      d.insertAdjacentHTML("beforeend",`<p class="prox">Uma nova investigação está prestes a começar… <span id="seg">15</span>s</p><p><button class="op" id="go">Ir para o Caso 002 agora</button></p>`);
+      let t=15; const iv=setInterval(()=>{t--; if(t<=0){clearInterval(iv);troca();} else {const s=$("#seg"); if(s)s.textContent=t;}},1000);
+      $("#go").onclick=()=>{clearInterval(iv);troca();};
+    } else {
+      d.insertAdjacentHTML("beforeend",`<p><button class="op" id="again">Jogar de novo</button></p>`);
+      $("#again").onclick=()=>location.reload();
+    }
+  } else if(c.encerra){
+    fim=true; $("#btnAcusar").disabled=true;
+    d.innerHTML=`<h2>Acusação errada</h2>${c.erra(c.pessoas[i].nome)}<p><button class="op" id="again">Jogar de novo</button></p>`;
+    $("#again").onclick=()=>location.reload();
+  } else {
+    d.innerHTML=`<h2>Acusação errada</h2>${c.erra(c.pessoas[i].nome)}<p><button class="op" id="cx">Voltar à investigação</button></p>`;
+    $("#cx").onclick=()=>d.close();
+  }
+}
+function troca(){
+  if(trocando||C!==0)return; trocando=true;
+  $("#cartela").classList.add("on");
+  setTimeout(()=>{$("#dlg").close();carregar(1);window.scrollTo(0,0);},900);
+  setTimeout(()=>{$("#cartela").classList.remove("on");trocando=false;},2400);
+}
+function carregar(n){
+  C=n; est={a:{},v:[],e:[]}; fim=false; const c=CASOS[n];
+  $("#sub").textContent=c.sub; $("#dica").textContent=c.dica; $("#mansao").innerHTML=c.scene();
+  document.querySelectorAll(".room").forEach(g=>{
+    const go=()=>visitar(+g.dataset.r);
+    g.addEventListener("click",go);
+    g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});
+  });
+  $("#suspeitos").innerHTML=c.pessoas.map((p,i)=>`<button class="sus" data-i="${i}"><div class="moldura-ret">${p.svg}</div><b>${p.nome}</b>${p.papel}<small>${p.falas.length>1?`Entrevistas 0/${p.falas.length}`:""}</small></button>`).join("");
+  document.querySelectorAll(".sus").forEach(b=>b.onclick=()=>interrogar(+b.dataset.i));
+  quadro(); $("#btnAcusar").disabled=false;
+  cena(c.scene().replace(/<g class="room"[\s\S]*?<\/g>/g,""),"objeto",c.introT,c.intro);
+}
+$("#btnAcusar").onclick=acusar;
+carregar(0);
+</script>
+</body>
+</html>
